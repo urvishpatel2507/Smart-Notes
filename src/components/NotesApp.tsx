@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Save, Settings, Sparkles, Globe, ShieldCheck, RotateCcw } from 'lucide-react';
+import { Save, Settings, Sparkles, Globe, ShieldCheck, RotateCcw, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -8,15 +8,19 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { RichTextEditor } from './RichTextEditor';
 import { NotesSidebar } from './NotesSidebar';
+import { ThemeToggle } from './ThemeToggle';
 import { useNotes } from '@/hooks/useNotes';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { AIService } from '@/utils/ai';
 import { Note, EncryptedNote, AIFeatures } from '@/types/note';
 import { cn } from '@/lib/utils';
 
 export function NotesApp() {
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   const {
     notes,
     searchQuery,
@@ -41,6 +45,7 @@ export function NotesApp() {
   const [translatedContent, setTranslatedContent] = useState('');
   const [isTranslating, setIsTranslating] = useState(false);
   const [autoSave, setAutoSave] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Auto-save functionality
   useEffect(() => {
@@ -93,7 +98,12 @@ export function NotesApp() {
     }
 
     setAIFeatures(null);
-  }, [selectedNote, noteTitle, noteContent, decryptNote, toast]);
+    
+    // Close sidebar on mobile after selecting a note
+    if (isMobile) {
+      setSidebarOpen(false);
+    }
+  }, [selectedNote, noteTitle, noteContent, decryptNote, toast, isMobile]);
 
   // Create new note
   const handleCreateNote = useCallback(() => {
@@ -287,85 +297,145 @@ export function NotesApp() {
 
   return (
     <div className="flex h-screen bg-background">
-      {/* Sidebar */}
-      <div className="w-80 flex-shrink-0">
-        <NotesSidebar
-          notes={notes}
-          selectedNoteId={selectedNote?.id || null}
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          onNoteSelect={handleNoteSelect}
-          onCreateNote={handleCreateNote}
-          onDeleteNote={handleDeleteNote}
-          onTogglePin={togglePin}
-        />
-      </div>
+      {/* Desktop Sidebar */}
+      {!isMobile && (
+        <div className="w-80 flex-shrink-0">
+          <NotesSidebar
+            notes={notes}
+            selectedNoteId={selectedNote?.id || null}
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            onNoteSelect={handleNoteSelect}
+            onCreateNote={handleCreateNote}
+            onDeleteNote={handleDeleteNote}
+            onTogglePin={togglePin}
+          />
+        </div>
+      )}
+
+      {/* Mobile Sidebar */}
+      {isMobile && (
+        <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
+          <SheetContent side="left" className="w-80 p-0">
+            <NotesSidebar
+              notes={notes}
+              selectedNoteId={selectedNote?.id || null}
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              onNoteSelect={handleNoteSelect}
+              onCreateNote={handleCreateNote}
+              onDeleteNote={handleDeleteNote}
+              onTogglePin={togglePin}
+            />
+          </SheetContent>
+        </Sheet>
+      )}
 
       {/* Main Editor */}
       <div className="flex-1 flex flex-col">
         {selectedNote ? (
           <>
             {/* Editor Header */}
-            <div className="flex items-center justify-between p-4 border-b border-border">
-              <div className="flex-1 min-w-0 mr-4">
-                <Input
-                  value={noteTitle}
-                  onChange={(e) => setNoteTitle(e.target.value)}
-                  placeholder="Note title..."
-                  className="text-lg font-semibold border-none shadow-none p-0 h-auto focus-visible:ring-0"
-                />
-                <div className="flex items-center gap-2 mt-2">
-                  {selectedNote.isEncrypted && (
-                    <Badge variant="secondary" className="text-xs">
-                      <ShieldCheck className="h-3 w-3 mr-1" />
-                      Encrypted
-                    </Badge>
-                  )}
-                  {aiFeatures?.suggestedTags.map((tag, index) => (
-                    <Badge key={index} variant="outline" className="text-xs">
-                      {tag}
-                    </Badge>
-                  ))}
+            <div className="flex items-center justify-between p-3 sm:p-4 border-b border-border">
+              <div className="flex items-center gap-2 flex-1 min-w-0">
+                {/* Mobile Menu Button */}
+                {isMobile && (
+                  <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
+                    <SheetTrigger asChild>
+                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                        <Menu className="h-4 w-4" />
+                      </Button>
+                    </SheetTrigger>
+                  </Sheet>
+                )}
+                
+                <div className="flex-1 min-w-0">
+                  <Input
+                    value={noteTitle}
+                    onChange={(e) => setNoteTitle(e.target.value)}
+                    placeholder="Note title..."
+                    className="text-base sm:text-lg font-semibold border-none shadow-none p-0 h-auto focus-visible:ring-0"
+                  />
+                  <div className="flex items-center gap-1 sm:gap-2 mt-1 sm:mt-2 flex-wrap">
+                    {selectedNote.isEncrypted && (
+                      <Badge variant="secondary" className="text-xs">
+                        <ShieldCheck className="h-3 w-3 mr-1" />
+                        <span className="hidden sm:inline">Encrypted</span>
+                        <span className="sm:hidden">🔒</span>
+                      </Badge>
+                    )}
+                    {aiFeatures?.suggestedTags.map((tag, index) => (
+                      <Badge key={index} variant="outline" className="text-xs">
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
               </div>
 
               {/* Actions */}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 sm:gap-2">
+                <ThemeToggle />
+                
                 <Button
                   onClick={handleAnalyzeNote}
                   disabled={isAnalyzing}
                   size="sm"
                   variant="outline"
                   title="Analyze with AI"
+                  className="hidden sm:flex"
                 >
                   <Sparkles className={cn("h-4 w-4", isAnalyzing && "animate-spin")} />
                   {isAnalyzing ? "Analyzing..." : "AI Analyze"}
+                </Button>
+                
+                {/* Mobile AI Button */}
+                <Button
+                  onClick={handleAnalyzeNote}
+                  disabled={isAnalyzing}
+                  size="sm"
+                  variant="outline"
+                  title="Analyze with AI"
+                  className="sm:hidden h-8 w-8 p-0"
+                >
+                  <Sparkles className={cn("h-4 w-4", isAnalyzing && "animate-spin")} />
                 </Button>
 
                 <Button
                   onClick={handleSaveNote}
                   size="sm"
                   title="Save note"
+                  className="hidden sm:flex"
                 >
                   <Save className="h-4 w-4 mr-2" />
                   Save
+                </Button>
+                
+                {/* Mobile Save Button */}
+                <Button
+                  onClick={handleSaveNote}
+                  size="sm"
+                  title="Save note"
+                  className="sm:hidden h-8 w-8 p-0"
+                >
+                  <Save className="h-4 w-4" />
                 </Button>
 
                 {/* Settings Dialog */}
                 <Dialog open={showSettingsDialog} onOpenChange={setShowSettingsDialog}>
                   <DialogTrigger asChild>
-                    <Button variant="outline" size="sm" title="Settings">
+                    <Button variant="outline" size="sm" title="Settings" className="h-8 w-8 p-0">
                       <Settings className="h-4 w-4" />
                     </Button>
                   </DialogTrigger>
-                  <DialogContent>
+                  <DialogContent className="sm:max-w-md">
                     <DialogHeader>
                       <DialogTitle>Note Settings</DialogTitle>
                     </DialogHeader>
                     <div className="space-y-4">
                       <div className="space-y-2">
                         <Label>Translation</Label>
-                        <div className="flex gap-2">
+                        <div className="flex flex-col sm:flex-row gap-2">
                           <Select value={translationLanguage} onValueChange={setTranslationLanguage}>
                             <SelectTrigger className="flex-1">
                               <SelectValue />
@@ -381,6 +451,7 @@ export function NotesApp() {
                             onClick={handleTranslateNote}
                             disabled={isTranslating}
                             variant="outline"
+                            className="w-full sm:w-auto"
                           >
                             <Globe className="h-4 w-4 mr-2" />
                             {isTranslating ? "Translating..." : "Translate"}
@@ -402,7 +473,7 @@ export function NotesApp() {
                 {/* Encryption Dialog */}
                 <Dialog open={showEncryptionDialog} onOpenChange={setShowEncryptionDialog}>
                   <DialogTrigger asChild>
-                    <Button variant="outline" size="sm" title="Create encrypted note">
+                    <Button variant="outline" size="sm" title="Create encrypted note" className="h-8 w-8 p-0">
                       <ShieldCheck className="h-4 w-4" />
                     </Button>
                   </DialogTrigger>
@@ -456,14 +527,14 @@ export function NotesApp() {
           </>
         ) : (
           // Empty state
-          <div className="flex-1 flex items-center justify-center">
-            <div className="text-center max-w-md">
+          <div className="flex-1 flex items-center justify-center p-4">
+            <div className="text-center max-w-md w-full">
               <div className="mb-4">
                 <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Save className="h-8 w-8 text-primary" />
                 </div>
-                <h2 className="text-xl font-semibold mb-2">Welcome to Shareable Notes</h2>
-                <p className="text-muted-foreground mb-6">
+                <h2 className="text-lg sm:text-xl font-semibold mb-2">Welcome to Smart Notes</h2>
+                <p className="text-muted-foreground mb-6 text-sm sm:text-base">
                   Create, edit, and organize your notes with AI-powered features and encryption.
                 </p>
               </div>

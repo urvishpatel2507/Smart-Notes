@@ -1,73 +1,126 @@
-# Welcome to your Lovable project
+# Smart Notes - AI-Powered Note Taking App
 
-## Project info
+A modern, feature-rich notes application built with React, TypeScript, and AI-powered features. Create, edit, and organize your notes with advanced capabilities including encryption, AI analysis, and responsive design.
 
-**URL**: https://lovable.dev/projects/cf6248d9-f975-4ab0-acf3-2939d8e63b99
+## ✨ Features
 
-## How can I edit this code?
+- 📝 **Rich Text Editor** - Full-featured text editor with formatting capabilities
+- 🤖 **AI-Powered Analysis** - Automatic note analysis, summaries, and tag suggestions
+- 🔒 **End-to-End Encryption** - Secure notes with password protection
+- 🌍 **Multi-language Translation** - Translate notes to multiple languages
+- 📱 **Responsive Design** - Works perfectly on desktop, tablet, and mobile
+- 🎨 **Light/Dark Theme** - Beautiful themes with system preference detection
+- 🔍 **Smart Search** - Find notes quickly with intelligent search
+- 📌 **Pin & Organize** - Pin important notes and organize with tags
+- 💾 **Auto-save** - Never lose your work with automatic saving
+- ⌨️ **Keyboard Shortcuts** - Efficient list editing with keyboard shortcuts
 
-There are several ways of editing your application.
+## 🚀 Getting Started
 
-**Use Lovable**
+### Prerequisites
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/cf6248d9-f975-4ab0-acf3-2939d8e63b99) and start prompting.
+- Node.js (v16 or higher)
+- npm or yarn
 
-Changes made via Lovable will be committed automatically to this repo.
+### Installation
 
-**Use your preferred IDE**
+1. **Clone the repository**
+   ```bash
+   git clone <YOUR_REPO_URL>
+   cd smart-notes
+   ```
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+3. **Start the development server**
+   ```bash
+   npm run dev
+   ```
 
-Follow these steps:
+4. **Open your browser**
+   Navigate to `http://localhost:5173` to see the application.
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## 🛠️ Built With
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+- **Frontend**: React 18 with TypeScript
+- **UI Framework**: shadcn/ui components with Radix UI primitives
+- **Styling**: Tailwind CSS
+- **Build Tool**: Vite
+- **State Management**: React hooks with custom hooks
+- **Routing**: React Router DOM
+- **Icons**: Lucide React
+- **Theme**: next-themes for light/dark mode
 
-# Step 3: Install the necessary dependencies.
-npm i
+## 📱 Usage
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+### Creating Notes
+- Click the "+" button in the sidebar to create a new note
+- Use the encryption button to create password-protected notes
+- Start typing to begin writing your note
+
+### AI Features
+- Click the "AI Analyze" button to get automatic analysis
+- View AI-generated summaries and suggested tags
+- Use the translation feature to translate notes to other languages
+
+### Organization
+- Pin important notes using the pin button
+- Search through all your notes using the search bar
+- Use tags to categorize and organize your notes
+
+### Mobile Usage
+- On mobile devices, tap the menu button to access the sidebar
+- All features work seamlessly on touch devices
+- Responsive design adapts to your screen size
+
+## 🔧 Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
+- `npm run lint` - Run ESLint
+
+## 📁 Project Structure
+
+```
+src/
+├── components/          # React components
+│   ├── ui/             # shadcn/ui components
+│   ├── NotesApp.tsx    # Main application component
+│   ├── RichTextEditor.tsx # Text editor component
+│   └── NotesSidebar.tsx   # Sidebar component
+├── hooks/              # Custom React hooks
+├── types/              # TypeScript type definitions
+├── utils/              # Utility functions
+├── pages/              # Route components
+└── lib/                # Library utilities
 ```
 
-**Edit a file directly in GitHub**
+## 🔒 Security
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+- Notes are encrypted using Web Crypto API with AES-GCM
+- Passwords are hashed using PBKDF2 with 100,000 iterations
+- All encryption happens client-side for maximum security
+- No data is sent to external servers
 
-**Use GitHub Codespaces**
+## 🤝 Contributing
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-## What technologies are used for this project?
+## 📄 License
 
-This project is built with:
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 🙏 Acknowledgments
 
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/cf6248d9-f975-4ab0-acf3-2939d8e63b99) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+- [shadcn/ui](https://ui.shadcn.com) for the beautiful UI components
+- [Lucide](https://lucide.dev) for the amazing icons
+- [Tailwind CSS](https://tailwindcss.com) for the utility-first CSS framework
+- [Vite](https://vitejs.dev) for the fast build tool

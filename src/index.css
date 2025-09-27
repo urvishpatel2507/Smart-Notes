@@ -127,3 +127,81 @@ All colors MUST be HSL.
   max-width: 250px;
   pointer-events: none;
 }
+
+/* Rich text editor list styles */
+.rich-text-editor ul {
+  list-style-type: disc;
+  margin-left: 1.5rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.rich-text-editor ol {
+  list-style-type: decimal;
+  margin-left: 1.5rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.rich-text-editor li {
+  margin-bottom: 0.25rem;
+  line-height: 1.5;
+}
+
+.rich-text-editor ul ul {
+  list-style-type: circle;
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.rich-text-editor ul ul ul {
+  list-style-type: square;
+}
+
+.rich-text-editor ol ol {
+  list-style-type: lower-alpha;
+}
+
+.rich-text-editor ol ol ol {
+  list-style-type: lower-roman;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .rich-text-editor ul,
+  .rich-text-editor ol {
+    margin-left: 1rem;
+  }
+  
+  .rich-text-editor li {
+    margin-bottom: 0.5rem;
+  }
+}
+
+/* Touch-friendly interactions */
+@media (hover: none) and (pointer: coarse) {
+  .group:hover .opacity-0 {
+    opacity: 1 !important;
+  }
+  
+  .group:active {
+    transform: scale(0.98);
+  }
+}
+
+/* Improved mobile scrolling */
+@media (max-width: 768px) {
+  .overflow-y-auto {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Mobile-optimized text selection */
+@media (max-width: 768px) {
+  .rich-text-editor {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+  }
+}

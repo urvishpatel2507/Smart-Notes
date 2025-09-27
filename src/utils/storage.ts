@@ -1,7 +1,7 @@
 import { Note, EncryptedNote } from '@/types/note';
 
-const STORAGE_KEY = 'shareable-notes';
-const ENCRYPTED_STORAGE_KEY = 'encrypted-notes';
+const STORAGE_KEY = 'smart-notes';
+const ENCRYPTED_STORAGE_KEY = 'smart-notes-encrypted';
 
 // Simple encryption using Web Crypto API
 export class NoteEncryption {
