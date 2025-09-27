@@ -8,7 +8,9 @@ import {
   AlignRight,
   Type,
   Eye,
-  EyeOff
+  EyeOff,
+  List,
+  ListOrdered
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -130,6 +132,18 @@ export function RichTextEditor({
       active: selectedFormat.has('underline')
     },
     {
+      command: { command: 'insertUnorderedList' },
+      icon: List,
+      label: 'Bullet List',
+      active: false
+    },
+    {
+      command: { command: 'insertOrderedList' },
+      icon: ListOrdered,
+      label: 'Numbered List',
+      active: false
+    },
+    {
       command: { command: 'justifyLeft' },
       icon: AlignLeft,
       label: 'Align Left',
@@ -150,6 +164,15 @@ export function RichTextEditor({
   ];
 
   const fontSizes = ['12px', '14px', '16px', '18px', '20px', '24px', '28px', '32px'];
+  const fontFamilies = [
+    { label: 'Default', value: 'inherit' },
+    { label: 'Arial', value: 'Arial, sans-serif' },
+    { label: 'Helvetica', value: 'Helvetica, sans-serif' },
+    { label: 'Times New Roman', value: 'Times New Roman, serif' },
+    { label: 'Georgia', value: 'Georgia, serif' },
+    { label: 'Courier New', value: 'Courier New, monospace' },
+    { label: 'Verdana', value: 'Verdana, sans-serif' }
+  ];
 
   return (
     <div className={cn("flex flex-col h-full", className)}>
@@ -172,18 +195,34 @@ export function RichTextEditor({
           );
         })}
 
-        {/* Font size selector */}
-        <div className="flex items-center gap-2 ml-4">
-          <Type className="h-4 w-4 text-muted-foreground" />
+        {/* Font controls */}
+        <div className="flex items-center gap-2 ml-4 border-l border-border pl-4">
+          {/* Font family selector */}
           <select
-            className="text-sm border border-border rounded px-2 py-1 bg-background"
-            onChange={(e) => execCommand({ command: 'fontSize', value: e.target.value })}
-            defaultValue="16px"
+            className="text-sm border border-border rounded px-2 py-1 bg-background min-w-[120px]"
+            onChange={(e) => execCommand({ command: 'fontName', value: e.target.value })}
+            defaultValue="inherit"
           >
-            {fontSizes.map(size => (
-              <option key={size} value={size}>{size}</option>
+            {fontFamilies.map(font => (
+              <option key={font.value} value={font.value} style={{ fontFamily: font.value }}>
+                {font.label}
+              </option>
             ))}
           </select>
+
+          {/* Font size selector */}
+          <div className="flex items-center gap-2">
+            <Type className="h-4 w-4 text-muted-foreground" />
+            <select
+              className="text-sm border border-border rounded px-2 py-1 bg-background"
+              onChange={(e) => execCommand({ command: 'fontSize', value: e.target.value })}
+              defaultValue="16px"
+            >
+              {fontSizes.map(size => (
+                <option key={size} value={size}>{size}</option>
+              ))}
+            </select>
+          </div>
         </div>
 
         {/* Preview toggle */}

@@ -146,21 +146,46 @@ export function NotesApp() {
   }, [selectedNote, noteTitle, noteContent, updateNote, autoSave, toast]);
 
   // Delete note
-  const handleDeleteNote = useCallback((id: string) => {
+  const handleDeleteNote = useCallback(async (id: string) => {
+    // Check if note is encrypted
+    const noteToDelete = notes.find(note => note.id === id);
+    const isEncrypted = noteToDelete && ('encryptedContent' in noteToDelete || noteToDelete.isEncrypted);
+    
+    let password = '';
+    if (isEncrypted) {
+      password = prompt('Enter password to delete this encrypted note:') || '';
+      if (!password) {
+        toast({
+          title: "Deletion Cancelled",
+          description: "Password required to delete encrypted note."
+        });
+        return;
+      }
+    }
+
+    const success = await deleteNote(id, password);
+    
+    if (!success) {
+      toast({
+        title: "Deletion Failed",
+        description: "Invalid password or unable to delete note.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     if (selectedNote?.id === id) {
       setSelectedNote(null);
       setNoteTitle('');
       setNoteContent('');
       setAIFeatures(null);
     }
-
-    deleteNote(id);
     
     toast({
       title: "Note Deleted",
       description: "Note has been permanently deleted."
     });
-  }, [selectedNote, deleteNote, toast]);
+  }, [selectedNote, deleteNote, notes, toast]);
 
   // Analyze note with AI
   const handleAnalyzeNote = useCallback(async () => {

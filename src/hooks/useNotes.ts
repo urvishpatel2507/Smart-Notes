@@ -78,10 +78,34 @@ export function useNotes() {
     }
   }, []);
 
-  const deleteNote = useCallback((id: string) => {
+  const deleteNote = useCallback(async (id: string, password?: string): Promise<boolean> => {
+    // Check if the note is encrypted
+    const encryptedNote = encryptedNotes.find(note => note.id === id);
+    
+    if (encryptedNote && !password) {
+      // Encrypted note requires password for deletion
+      return false;
+    }
+    
+    if (encryptedNote && password) {
+      // Verify password by attempting to decrypt
+      try {
+        await NoteEncryption.decrypt(
+          encryptedNote.encryptedContent,
+          password,
+          encryptedNote.salt
+        );
+      } catch {
+        // Invalid password
+        return false;
+      }
+    }
+    
+    // Delete the note
     setNotes(prev => prev.filter(note => note.id !== id));
     setEncryptedNotes(prev => prev.filter(note => note.id !== id));
-  }, []);
+    return true;
+  }, [encryptedNotes]);
 
   const togglePin = useCallback((id: string) => {
     setNotes(prev => prev.map(note => 
