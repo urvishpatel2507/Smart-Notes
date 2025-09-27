@@ -160,7 +160,7 @@ export function NotesSidebar({
       {/* Header */}
       <div className="p-4 border-b border-border">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-lg font-semibold text-foreground">Notes</h1>
+          <h1 className="text-lg font-semibold text-foreground">Smart Notes</h1>
           <Button
             onClick={onCreateNote}
             size="sm"
