@@ -1,8 +1,6 @@
-import { AIFeatures, GlossaryTerm, GrammarError } from '@/types/note';
-
 // Mock AI service - In production, integrate with Groq, OpenAI, or other AI service
 export class AIService {
-  static async analyzeNote(content: string): Promise<AIFeatures> {
+  static async analyzeNote(content) {
     // Simulate API delay
     await this.delay(1000);
 
@@ -14,15 +12,15 @@ export class AIService {
     };
   }
 
-  private static delay(ms: number): Promise<void> {
+  static delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
-  private static extractGlossaryTerms(content: string): GlossaryTerm[] {
-    const terms: GlossaryTerm[] = [];
+  static extractGlossaryTerms(content) {
+    const terms = [];
     
     // Mock glossary - in production, use AI to identify key terms
-    const glossary: Record<string, string> = {
+    const glossary = {
       'artificial intelligence': 'A branch of computer science that aims to create intelligent machines.',
       'machine learning': 'A subset of AI that enables computers to learn without explicit programming.',
       'algorithm': 'A set of rules or instructions for solving a problem.',
@@ -52,7 +50,7 @@ export class AIService {
     return terms;
   }
 
-  private static generateSummary(content: string): string {
+  static generateSummary(content) {
     if (content.length < 50) {
       return content.substring(0, 100) + (content.length > 100 ? '...' : '');
     }
@@ -71,7 +69,7 @@ export class AIService {
     return firstSentence.substring(0, 120) + (firstSentence.length > 120 ? '...' : '');
   }
 
-  private static generateTags(content: string): string[] {
+  static generateTags(content) {
     const words = content.toLowerCase()
       .replace(/[^\w\s]/g, ' ')
       .split(/\s+/)
@@ -79,7 +77,7 @@ export class AIService {
 
     const commonWords = new Set(['this', 'that', 'with', 'have', 'will', 'from', 'they', 'know', 'want', 'been', 'good', 'much', 'some', 'time', 'very', 'when', 'come', 'here', 'just', 'like', 'long', 'make', 'many', 'over', 'such', 'take', 'than', 'them', 'well', 'were']);
     
-    const wordFreq: Record<string, number> = {};
+    const wordFreq = {};
     words.forEach(word => {
       if (!commonWords.has(word)) {
         wordFreq[word] = (wordFreq[word] || 0) + 1;
@@ -106,8 +104,8 @@ export class AIService {
     return [...new Set([...contextualTags, ...tags])].slice(0, 5);
   }
 
-  private static findGrammarErrors(content: string): GrammarError[] {
-    const errors: GrammarError[] = [];
+  static findGrammarErrors(content) {
+    const errors = [];
     
     // Mock grammar checking - in production, use AI grammar service
     const commonErrors = [
@@ -133,11 +131,11 @@ export class AIService {
     return errors;
   }
 
-  static async translateText(text: string, targetLanguage: string): Promise<string> {
+  static async translateText(text, targetLanguage) {
     await this.delay(1500);
     
     // Mock translation - in production, use AI translation service
-    const translations: Record<string, Record<string, string>> = {
+    const translations = {
       'es': { 'hello': 'hola', 'world': 'mundo', 'note': 'nota', 'text': 'texto' },
       'fr': { 'hello': 'bonjour', 'world': 'monde', 'note': 'note', 'text': 'texte' },
       'de': { 'hello': 'hallo', 'world': 'welt', 'note': 'notiz', 'text': 'text' }

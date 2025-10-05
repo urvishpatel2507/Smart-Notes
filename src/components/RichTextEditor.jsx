@@ -16,16 +16,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
-import { FormatCommand, GlossaryTerm, GrammarError } from '@/types/note';
-
-interface RichTextEditorProps {
-  content: string;
-  onChange: (content: string) => void;
-  glossaryTerms?: GlossaryTerm[];
-  grammarErrors?: GrammarError[];
-  placeholder?: string;
-  className?: string;
-}
 
 export function RichTextEditor({
   content,
@@ -34,10 +24,10 @@ export function RichTextEditor({
   grammarErrors = [],
   placeholder = "Start writing your note...",
   className
-}: RichTextEditorProps) {
-  const editorRef = useRef<HTMLDivElement>(null);
+}) {
+  const editorRef = useRef(null);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
-  const [selectedFormat, setSelectedFormat] = useState<Set<string>>(new Set());
+  const [selectedFormat, setSelectedFormat] = useState(new Set());
   const [isMobile, setIsMobile] = useState(false);
 
   // Check if mobile
@@ -66,7 +56,7 @@ export function RichTextEditor({
   }, [onChange]);
 
   // Execute format command
-  const execCommand = useCallback((command: FormatCommand) => {
+  const execCommand = useCallback((command) => {
     // Handle list commands specially
     if (command.command === 'insertUnorderedList' || command.command === 'insertOrderedList') {
       const selection = window.getSelection();
@@ -134,7 +124,7 @@ export function RichTextEditor({
     setTimeout(() => {
       const selection = window.getSelection();
       if (selection && selection.rangeCount > 0) {
-        const formats = new Set<string>();
+        const formats = new Set();
         if (document.queryCommandState('bold')) formats.add('bold');
         if (document.queryCommandState('italic')) formats.add('italic');
         if (document.queryCommandState('underline')) formats.add('underline');
@@ -144,7 +134,7 @@ export function RichTextEditor({
   }, [handleInput]);
 
   // Handle keyboard shortcuts
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+  const handleKeyDown = useCallback((e) => {
     // Handle Enter key in lists
     if (e.key === 'Enter') {
       const selection = window.getSelection();
@@ -248,7 +238,7 @@ export function RichTextEditor({
   // Handle selection change to update toolbar state
   const handleSelectionChange = useCallback(() => {
     if (document.activeElement === editorRef.current) {
-      const formats = new Set<string>();
+      const formats = new Set();
       if (document.queryCommandState('bold')) formats.add('bold');
       if (document.queryCommandState('italic')) formats.add('italic');
       if (document.queryCommandState('underline')) formats.add('underline');
@@ -262,7 +252,7 @@ export function RichTextEditor({
   }, [handleSelectionChange]);
 
   // Format content with glossary and grammar highlighting
-  const formatContentWithHighlights = useCallback((text: string): string => {
+  const formatContentWithHighlights = useCallback((text) => {
     if (isPreviewMode) return text;
 
     let formatted = text;

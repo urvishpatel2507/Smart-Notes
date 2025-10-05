@@ -15,7 +15,6 @@ import { ThemeToggle } from './ThemeToggle';
 import { useNotes } from '@/hooks/useNotes';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { AIService } from '@/utils/ai';
-import { Note, EncryptedNote, AIFeatures } from '@/types/note';
 import { cn } from '@/lib/utils';
 
 export function NotesApp() {
@@ -33,10 +32,10 @@ export function NotesApp() {
     loading
   } = useNotes();
 
-  const [selectedNote, setSelectedNote] = useState<Note | null>(null);
+  const [selectedNote, setSelectedNote] = useState(null);
   const [noteTitle, setNoteTitle] = useState('');
   const [noteContent, setNoteContent] = useState('');
-  const [aiFeatures, setAIFeatures] = useState<AIFeatures | null>(null);
+  const [aiFeatures, setAIFeatures] = useState(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [encryptionPassword, setEncryptionPassword] = useState('');
   const [showEncryptionDialog, setShowEncryptionDialog] = useState(false);
@@ -61,7 +60,7 @@ export function NotesApp() {
   }, [noteTitle, noteContent, selectedNote, autoSave]);
 
   // Handle note selection
-  const handleNoteSelect = useCallback(async (note: Note | EncryptedNote) => {
+  const handleNoteSelect = useCallback(async (note) => {
     // Save current note if changes exist
     if (selectedNote && (noteTitle !== selectedNote.title || noteContent !== selectedNote.content)) {
       await handleSaveNote();
@@ -82,7 +81,7 @@ export function NotesApp() {
         return;
       }
 
-      const decryptedNote: Note = {
+      const decryptedNote = {
         ...note,
         content: decryptedContent,
         isEncrypted: true
@@ -112,7 +111,7 @@ export function NotesApp() {
     
     const noteId = createNote(newTitle, newContent);
     
-    const newNote: Note = {
+    const newNote = {
       id: noteId,
       title: newTitle,
       content: newContent,
@@ -156,7 +155,7 @@ export function NotesApp() {
   }, [selectedNote, noteTitle, noteContent, updateNote, autoSave, toast]);
 
   // Delete note
-  const handleDeleteNote = useCallback(async (id: string) => {
+  const handleDeleteNote = useCallback(async (id) => {
     // Check if note is encrypted
     const noteToDelete = notes.find(note => note.id === id);
     const isEncrypted = noteToDelete && ('encryptedContent' in noteToDelete || noteToDelete.isEncrypted);

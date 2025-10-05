@@ -1,11 +1,9 @@
-import { Note, EncryptedNote } from '@/types/note';
-
 const STORAGE_KEY = 'smart-notes';
 const ENCRYPTED_STORAGE_KEY = 'smart-notes-encrypted';
 
 // Simple encryption using Web Crypto API
 export class NoteEncryption {
-  private static async deriveKey(password: string, salt: Uint8Array): Promise<CryptoKey> {
+  static async deriveKey(password, salt) {
     const encoder = new TextEncoder();
     const keyMaterial = await crypto.subtle.importKey(
       'raw',
@@ -29,7 +27,7 @@ export class NoteEncryption {
     );
   }
 
-  static async encrypt(text: string, password: string): Promise<{ encrypted: string; salt: string }> {
+  static async encrypt(text, password) {
     const encoder = new TextEncoder();
     const salt = crypto.getRandomValues(new Uint8Array(16));
     const key = await this.deriveKey(password, salt);
@@ -52,7 +50,7 @@ export class NoteEncryption {
     };
   }
 
-  static async decrypt(encryptedData: string, password: string, saltString: string): Promise<string> {
+  static async decrypt(encryptedData, password, saltString) {
     const decoder = new TextDecoder();
     const salt = new Uint8Array(atob(saltString).split('').map(c => c.charCodeAt(0)));
     const key = await this.deriveKey(password, salt);
@@ -72,13 +70,13 @@ export class NoteEncryption {
 }
 
 export class NotesStorage {
-  static getNotes(): Note[] {
+  static getNotes() {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (!stored) return [];
       
       const notes = JSON.parse(stored);
-      return notes.map((note: any) => ({
+      return notes.map((note) => ({
         ...note,
         createdAt: new Date(note.createdAt),
         updatedAt: new Date(note.updatedAt)
@@ -88,17 +86,17 @@ export class NotesStorage {
     }
   }
 
-  static saveNotes(notes: Note[]): void {
+  static saveNotes(notes) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
   }
 
-  static getEncryptedNotes(): EncryptedNote[] {
+  static getEncryptedNotes() {
     try {
       const stored = localStorage.getItem(ENCRYPTED_STORAGE_KEY);
       if (!stored) return [];
       
       const notes = JSON.parse(stored);
-      return notes.map((note: any) => ({
+      return notes.map((note) => ({
         ...note,
         createdAt: new Date(note.createdAt),
         updatedAt: new Date(note.updatedAt)
@@ -108,11 +106,11 @@ export class NotesStorage {
     }
   }
 
-  static saveEncryptedNotes(notes: EncryptedNote[]): void {
+  static saveEncryptedNotes(notes) {
     localStorage.setItem(ENCRYPTED_STORAGE_KEY, JSON.stringify(notes));
   }
 
-  static generateId(): string {
+  static generateId() {
     return Date.now().toString(36) + Math.random().toString(36).substr(2);
   }
 }

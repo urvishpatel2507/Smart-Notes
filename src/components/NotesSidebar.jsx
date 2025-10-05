@@ -5,19 +5,6 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { ThemeToggle } from './ThemeToggle';
 import { cn } from '@/lib/utils';
-import { Note, EncryptedNote } from '@/types/note';
-
-interface NotesSidebarProps {
-  notes: (Note | EncryptedNote)[];
-  selectedNoteId: string | null;
-  searchQuery: string;
-  onSearchChange: (query: string) => void;
-  onNoteSelect: (note: Note | EncryptedNote) => void;
-  onCreateNote: () => void;
-  onDeleteNote: (id: string) => void;
-  onTogglePin: (id: string) => void;
-  className?: string;
-}
 
 function NoteCard({ 
   note, 
@@ -25,12 +12,6 @@ function NoteCard({
   onSelect, 
   onDelete, 
   onTogglePin 
-}: {
-  note: Note | EncryptedNote;
-  isSelected: boolean;
-  onSelect: () => void;
-  onDelete: () => void;
-  onTogglePin: () => void;
 }) {
   const [showActions, setShowActions] = useState(false);
   
@@ -154,7 +135,7 @@ export function NotesSidebar({
   onDeleteNote,
   onTogglePin,
   className
-}: NotesSidebarProps) {
+}) {
   return (
     <div className={cn("flex flex-col h-full bg-muted/30 border-r border-border", className)}>
       {/* Header */}

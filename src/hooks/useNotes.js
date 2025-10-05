@@ -1,10 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Note, EncryptedNote } from '@/types/note';
 import { NotesStorage, NoteEncryption } from '@/utils/storage';
 
 export function useNotes() {
-  const [notes, setNotes] = useState<Note[]>([]);
-  const [encryptedNotes, setEncryptedNotes] = useState<EncryptedNote[]>([]);
+  const [notes, setNotes] = useState([]);
+  const [encryptedNotes, setEncryptedNotes] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
 
@@ -30,8 +29,8 @@ export function useNotes() {
     }
   }, [encryptedNotes, loading]);
 
-  const createNote = useCallback((title: string, content: string, isEncrypted = false, password?: string) => {
-    const note: Note = {
+  const createNote = useCallback((title, content, isEncrypted = false, password) => {
+    const note = {
       id: NotesStorage.generateId(),
       title,
       content,
@@ -47,7 +46,7 @@ export function useNotes() {
       // Create encrypted note
       NoteEncryption.encrypt(content, password).then(({ encrypted, salt }) => {
         const { content, ...noteWithoutContent } = note;
-        const encryptedNote: EncryptedNote = {
+        const encryptedNote = {
           ...noteWithoutContent,
           encryptedContent: encrypted,
           salt
@@ -61,7 +60,7 @@ export function useNotes() {
     return note.id;
   }, []);
 
-  const updateNote = useCallback((id: string, updates: Partial<Note>, password?: string) => {
+  const updateNote = useCallback((id, updates, password) => {
     setNotes(prev => prev.map(note => 
       note.id === id 
         ? { ...note, ...updates, updatedAt: new Date() }
@@ -78,7 +77,7 @@ export function useNotes() {
     }
   }, []);
 
-  const deleteNote = useCallback(async (id: string, password?: string): Promise<boolean> => {
+  const deleteNote = useCallback(async (id, password) => {
     // Check if the note is encrypted
     const encryptedNote = encryptedNotes.find(note => note.id === id);
     
@@ -107,7 +106,7 @@ export function useNotes() {
     return true;
   }, [encryptedNotes]);
 
-  const togglePin = useCallback((id: string) => {
+  const togglePin = useCallback((id) => {
     setNotes(prev => prev.map(note => 
       note.id === id 
         ? { ...note, isPinned: !note.isPinned, updatedAt: new Date() }
@@ -121,7 +120,7 @@ export function useNotes() {
     ));
   }, []);
 
-  const decryptNote = useCallback(async (id: string, password: string): Promise<string | null> => {
+  const decryptNote = useCallback(async (id, password) => {
     const encryptedNote = encryptedNotes.find(note => note.id === id);
     if (!encryptedNote) return null;
 
