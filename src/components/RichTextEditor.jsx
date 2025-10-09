@@ -29,6 +29,8 @@ export function RichTextEditor({
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [selectedFormat, setSelectedFormat] = useState(new Set());
   const [isMobile, setIsMobile] = useState(false);
+  const [currentFontSize, setCurrentFontSize] = useState('16px');
+  const [currentFontFamily, setCurrentFontFamily] = useState('inherit');
 
   // Check if mobile
   useEffect(() => {
@@ -57,13 +59,14 @@ export function RichTextEditor({
 
   // Execute format command
   const execCommand = useCallback((command) => {
+    const selection = window.getSelection();
+
     // Handle list commands specially
     if (command.command === 'insertUnorderedList' || command.command === 'insertOrderedList') {
-      const selection = window.getSelection();
       if (selection && selection.rangeCount > 0) {
         const range = selection.getRangeAt(0);
         const listType = command.command === 'insertUnorderedList' ? 'ul' : 'ol';
-        
+
         // Check if we're already in a list
         let listElement = range.commonAncestorContainer.parentElement;
         while (listElement && listElement !== editorRef.current) {
@@ -91,11 +94,11 @@ export function RichTextEditor({
           }
           listElement = listElement.parentElement;
         }
-        
+
         // Create new list
         const list = document.createElement(listType);
         const listItem = document.createElement('li');
-        
+
         // If there's selected text, put it in the list item
         if (selection.toString()) {
           listItem.textContent = selection.toString();
@@ -103,10 +106,10 @@ export function RichTextEditor({
         } else {
           listItem.textContent = '• '; // Add bullet point for unordered lists
         }
-        
+
         list.appendChild(listItem);
         range.insertNode(list);
-        
+
         // Position cursor after the bullet/number
         const newRange = document.createRange();
         newRange.setStartAfter(listItem);
@@ -114,12 +117,66 @@ export function RichTextEditor({
         selection.removeAllRanges();
         selection.addRange(newRange);
       }
+    } else if (command.command === 'fontSize') {
+      // Handle font size changes manually for better control
+      if (selection && selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+
+        // If there's selected text, wrap it in a span with the font size
+        if (selection.toString()) {
+          const selectedText = selection.toString();
+          const span = document.createElement('span');
+          span.style.fontSize = command.value;
+          span.textContent = selectedText;
+
+          range.deleteContents();
+          range.insertNode(span);
+
+          // Position cursor after the span
+          const newRange = document.createRange();
+          newRange.setStartAfter(span);
+          newRange.collapse(true);
+          selection.removeAllRanges();
+          selection.addRange(newRange);
+        } else {
+          // If no selection, just set the font size for new text
+          document.execCommand('styleWithCSS', false, true);
+          document.execCommand('fontSize', false, command.value);
+        }
+      }
+    } else if (command.command === 'fontName') {
+      // Handle font family changes
+      if (selection && selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+
+        // If there's selected text, wrap it in a span with the font family
+        if (selection.toString()) {
+          const selectedText = selection.toString();
+          const span = document.createElement('span');
+          span.style.fontFamily = command.value;
+          span.textContent = selectedText;
+
+          range.deleteContents();
+          range.insertNode(span);
+
+          // Position cursor after the span
+          const newRange = document.createRange();
+          newRange.setStartAfter(span);
+          newRange.collapse(true);
+          selection.removeAllRanges();
+          selection.addRange(newRange);
+        } else {
+          // If no selection, just set the font family for new text
+          document.execCommand('styleWithCSS', false, true);
+          document.execCommand('fontName', false, command.value);
+        }
+      }
     } else {
       document.execCommand(command.command, false, command.value);
     }
-    
+
     editorRef.current?.focus();
-    
+
     // Update selected format state
     setTimeout(() => {
       const selection = window.getSelection();
@@ -235,16 +292,57 @@ export function RichTextEditor({
     }
   }, [handleInput]);
 
+  // Get computed style for an element, checking for inline styles first
+  const getComputedFontSize = useCallback((element) => {
+    // Check if the element has an inline fontSize style
+    if (element.style && element.style.fontSize) {
+      return element.style.fontSize;
+    }
+
+    // Otherwise, get the computed style
+    const computedStyle = window.getComputedStyle(element);
+    return computedStyle.fontSize || '16px';
+  }, []);
+
+  const getComputedFontFamily = useCallback((element) => {
+    // Check if the element has an inline fontFamily style
+    if (element.style && element.style.fontFamily) {
+      return element.style.fontFamily;
+    }
+
+    // Otherwise, get the computed style
+    const computedStyle = window.getComputedStyle(element);
+    return computedStyle.fontFamily || 'inherit';
+  }, []);
+
   // Handle selection change to update toolbar state
   const handleSelectionChange = useCallback(() => {
     if (document.activeElement === editorRef.current) {
-      const formats = new Set();
-      if (document.queryCommandState('bold')) formats.add('bold');
-      if (document.queryCommandState('italic')) formats.add('italic');
-      if (document.queryCommandState('underline')) formats.add('underline');
-      setSelectedFormat(formats);
+      const selection = window.getSelection();
+      if (selection && selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+        let element = range.commonAncestorContainer;
+
+        // If it's a text node, get its parent element
+        if (element.nodeType === Node.TEXT_NODE) {
+          element = element.parentElement;
+        }
+
+        // Get the current font size and family
+        const fontSize = getComputedFontSize(element);
+        const fontFamily = getComputedFontFamily(element);
+
+        setCurrentFontSize(fontSize);
+        setCurrentFontFamily(fontFamily);
+
+        const formats = new Set();
+        if (document.queryCommandState('bold')) formats.add('bold');
+        if (document.queryCommandState('italic')) formats.add('italic');
+        if (document.queryCommandState('underline')) formats.add('underline');
+        setSelectedFormat(formats);
+      }
     }
-  }, []);
+  }, [getComputedFontSize, getComputedFontFamily]);
 
   useEffect(() => {
     document.addEventListener('selectionchange', handleSelectionChange);
@@ -415,7 +513,7 @@ export function RichTextEditor({
             <select
               className="text-sm border border-border rounded px-2 py-1 bg-background min-w-[120px]"
               onChange={(e) => execCommand({ command: 'fontName', value: e.target.value })}
-              defaultValue="inherit"
+              value={currentFontFamily}
             >
               {fontFamilies.map(font => (
                 <option key={font.value} value={font.value} style={{ fontFamily: font.value }}>
@@ -430,7 +528,7 @@ export function RichTextEditor({
               <select
                 className="text-sm border border-border rounded px-2 py-1 bg-background"
                 onChange={(e) => execCommand({ command: 'fontSize', value: e.target.value })}
-                defaultValue="16px"
+                value={currentFontSize}
               >
                 {fontSizes.map(size => (
                   <option key={size} value={size}>{size}</option>
